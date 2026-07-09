@@ -10,11 +10,12 @@ Change ProjectsGrid mobile behavior from auto-play on scroll to manual playback 
 
 ## Desired Behavior
 - Desktop (md+): Keep existing hover-to-play behavior (no changes)
-- Mobile (<md): 
+- Mobile (<md):
   - Show thumbnail (no auto-play)
-  - Long-press/touch-hold triggers video playback
-  - Single tap/click opens project details page
-  - Video plays while held, pauses when user releases (or continues with pause button visible)
+  - **Touch-hold (long-press):** Video plays while finger is held down, just like hover on desktop
+  - **Release hold:** Video pauses and resets (like mouse leave on desktop)
+  - **Quick tap (< 500ms):** Opens project details page (no video playback)
+  - No auto-play on scroll
 
 ## Implementation Approach
 
@@ -25,11 +26,12 @@ Change ProjectsGrid mobile behavior from auto-play on scroll to manual playback 
 - Add `touchStartTime` ref to measure press duration (threshold: 500ms)
 
 ### 2. Update Touch Event Handling
-- Add `onTouchStart` handler: Record touch start time and track which card
-- Add `onTouchEnd` handler: Calculate press duration
-  - If duration >= 500ms: Set `touchHeldId` to play video
-  - If duration < 500ms: Let default click behavior open project details
-- Add `onTouchMove` handler: Detect if finger moved significantly (scrolling), cancel long-press
+- Add `onTouchStart` handler: Record touch start time and track which card, start holding timer
+- Add `onTouchEnd` handler:
+  - If held >= 500ms: User was holding, don't navigate (video already playing)
+  - If held < 500ms: Quick tap, navigate to project details
+  - Clear `touchHeldId` so video stops playing
+- Add `onTouchMove` handler: Detect if finger moved significantly (scrolling), cancel hold and reset timer
 
 ### 3. Update Video Visibility Logic
 - `shouldShowVideo()` function updated:
@@ -40,7 +42,8 @@ Change ProjectsGrid mobile behavior from auto-play on scroll to manual playback 
 ### 4. Remove Mobile Auto-Play
 - Disable intersection observer's state management on mobile
 - Ensure videos don't render when scrolled into view on mobile
-- Prevent preload state from triggering video playback
+- Only render video when `touchHeldId === projectId`
+- Prevent scroll-based playback entirely on mobile
 
 ## Key Files to Modify
 - `client/components/ProjectsGrid.tsx` - Main changes here
@@ -56,7 +59,12 @@ Change ProjectsGrid mobile behavior from auto-play on scroll to manual playback 
 
 ## User Experience
 1. User sees thumbnail on mobile
-2. Holds finger on thumbnail for ~0.5 seconds
-3. Video starts playing
-4. User can tap controls to pause/resume
-5. Quick tap (< 0.5s) or dragging = opens project details as normal
+2. **Scenario A - Watch preview:** User holds finger on thumbnail for ~0.5 seconds
+   - Video starts playing immediately while holding
+   - User releases finger = video stops and resets to thumbnail
+3. **Scenario B - Open project:** User taps thumbnail quickly (< 0.5s)
+   - Navigates to project details page
+   - No video playback triggered
+4. **Scenario C - Scroll:** User scrolls by dragging
+   - Scroll works normally without triggering video playback
+   - Hold timer cancels during drag movement

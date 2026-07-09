@@ -103,23 +103,20 @@ export default function ProjectsGrid({
   projects = defaultProjects,
 }: ProjectsGridProps) {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
+  const [inViewIds, setInViewIds] = useState<Set<number>>(new Set());
   const [touchHeldId, setTouchHeldId] = useState<number | null>(null);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
   const cardRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
-  const touchStartTimeRef = useRef<number | null>(null);
-  const touchStartIdRef = useRef<number | null>(null);
-  const touchMovedRef = useRef<boolean>(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const touchStartTimeRef = useRef<number>(0);
+  const touchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const navigate = useNavigate();
 
-  const isDesktop = () => typeof window !== 'undefined' && window.innerWidth >= 768;
-
   const handleMouseEnter = (projectId: number) => {
-    if (!isDesktop()) return;
     setHoveredId(projectId);
   };
 
   const handleMouseLeave = (projectId: number) => {
-    if (!isDesktop()) return;
     setHoveredId(null);
     const video = videoRefs.current[projectId];
     if (video) {
@@ -129,36 +126,40 @@ export default function ProjectsGrid({
   };
 
   const handleTouchStart = (projectId: number) => {
-    if (isDesktop()) return;
     touchStartTimeRef.current = Date.now();
-    touchStartIdRef.current = projectId;
-    touchMovedRef.current = false;
-  };
 
-  const handleTouchMove = () => {
-    if (isDesktop()) return;
-    touchMovedRef.current = true;
+    if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
+
+    touchTimerRef.current = setTimeout(() => {
+      setTouchHeldId(projectId);
+    }, 100);
   };
 
   const handleTouchEnd = (projectId: number) => {
-    if (isDesktop()) return;
+    if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
 
-    const touchDuration = touchStartTimeRef.current ? Date.now() - touchStartTimeRef.current : 0;
-    const isLongPress = touchDuration >= 250 && !touchMovedRef.current;
+    const touchDuration = Date.now() - touchStartTimeRef.current;
+    const isQuickTap = touchDuration < 500;
 
-    touchStartTimeRef.current = null;
-    touchStartIdRef.current = null;
-    touchMovedRef.current = false;
-
-    if (isLongPress) {
-      setTouchHeldId(projectId);
-    } else {
+    if (isQuickTap && touchHeldId === null) {
       navigate(`/project/${projectId}`);
+    }
+
+    setTouchHeldId(null);
+    const video = videoRefs.current[projectId];
+    if (video) {
+      video.pause();
+      video.currentTime = 0;
     }
   };
 
+  const handleTouchMove = () => {
+    if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
+    setTouchHeldId(null);
+  };
+
   useEffect(() => {
-    if (hoveredId !== null && isDesktop()) {
+    if (hoveredId !== null) {
       const video = videoRefs.current[hoveredId];
       if (video) {
         video.currentTime = 0;
@@ -168,11 +169,22 @@ export default function ProjectsGrid({
   }, [hoveredId]);
 
   useEffect(() => {
+    if (touchHeldId !== null) {
+      const video = videoRefs.current[touchHeldId];
+      if (video) {
+        video.currentTime = 0;
+        video.play().catch(() => {});
+      }
+    }
+  }, [touchHeldId]);
+
+  useEffect(() => {
     projects.forEach((project) => {
       const video = videoRefs.current[project.id];
       if (!video) return;
 
-      const shouldPlay = isDesktop() ? hoveredId === project.id : touchHeldId === project.id;
+      const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+      const shouldPlay = isDesktop ? hoveredId === project.id : touchHeldId === project.id;
 
       if (shouldPlay && video.paused) {
         video.currentTime = 0;
@@ -184,8 +196,44 @@ export default function ProjectsGrid({
     });
   }, [hoveredId, touchHeldId, projects]);
 
+  useEffect(() => {
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          const projectId = parseInt(entry.target.getAttribute("data-project-id") || "0");
+          if (entry.isIntersecting) {
+            setInViewIds((prev) => new Set(prev).add(projectId));
+          } else {
+            setInViewIds((prev) => {
+              const newSet = new Set(prev);
+              newSet.delete(projectId);
+              return newSet;
+            });
+          }
+        });
+      },
+      { threshold: 0.1 }
+    );
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    projects.forEach((project) => {
+      const cardElement = cardRefs.current[project.id];
+      if (cardElement && observerRef.current) {
+        observerRef.current.observe(cardElement);
+      }
+    });
+  }, [projects]);
+
   const shouldShowVideo = (projectId: number) => {
-    return isDesktop() ? hoveredId === projectId : touchHeldId === projectId;
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+    return isDesktop ? hoveredId === projectId : touchHeldId === projectId;
   };
 
   return (
@@ -203,12 +251,11 @@ export default function ProjectsGrid({
               onMouseEnter={() => handleMouseEnter(project.id)}
               onMouseLeave={() => handleMouseLeave(project.id)}
               onTouchStart={() => handleTouchStart(project.id)}
-              onTouchMove={() => handleTouchMove()}
               onTouchEnd={() => handleTouchEnd(project.id)}
+              onTouchMove={handleTouchMove}
               onClick={() => {
-                if (isDesktop()) {
-                  navigate(`/project/${project.id}`);
-                }
+                const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+                if (isDesktop) navigate(`/project/${project.id}`);
               }}
             >
               <div className="overflow-hidden rounded-lg">
