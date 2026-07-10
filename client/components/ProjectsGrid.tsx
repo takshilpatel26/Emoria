@@ -110,6 +110,7 @@ export default function ProjectsGrid({
   const observerRef = useRef<IntersectionObserver | null>(null);
   const touchStartTimeRef = useRef<number>(0);
   const touchTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const touchStartProjectIdRef = useRef<number | null>(null);
   const navigate = useNavigate();
 
   const handleMouseEnter = (projectId: number) => {
@@ -125,8 +126,9 @@ export default function ProjectsGrid({
     }
   };
 
-  const handleTouchStart = (projectId: number) => {
+  const handleTouchStart = (projectId: number, event: React.TouchEvent) => {
     touchStartTimeRef.current = Date.now();
+    touchStartProjectIdRef.current = projectId;
 
     if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
 
@@ -146,6 +148,7 @@ export default function ProjectsGrid({
     }
 
     setTouchHeldId(null);
+    touchStartProjectIdRef.current = null;
     const video = videoRefs.current[projectId];
     if (video) {
       video.pause();
@@ -153,9 +156,18 @@ export default function ProjectsGrid({
     }
   };
 
-  const handleTouchMove = () => {
-    if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
-    setTouchHeldId(null);
+  const handleTouchMove = (event: React.TouchEvent) => {
+    if (!touchStartProjectIdRef.current) return;
+
+    const touch = event.touches[0];
+    const element = document.elementFromPoint(touch.clientX, touch.clientY);
+    const cardElement = element?.closest('[data-project-id]') as HTMLElement | null;
+    const currentProjectId = cardElement ? parseInt(cardElement.getAttribute('data-project-id') || '0') : null;
+
+    if (currentProjectId !== touchStartProjectIdRef.current) {
+      if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
+      setTouchHeldId(null);
+    }
   };
 
   useEffect(() => {
@@ -250,7 +262,7 @@ export default function ProjectsGrid({
               className="group cursor-pointer"
               onMouseEnter={() => handleMouseEnter(project.id)}
               onMouseLeave={() => handleMouseLeave(project.id)}
-              onTouchStart={() => handleTouchStart(project.id)}
+              onTouchStart={(e) => handleTouchStart(project.id, e)}
               onTouchEnd={() => handleTouchEnd(project.id)}
               onTouchMove={handleTouchMove}
               onClick={() => {
