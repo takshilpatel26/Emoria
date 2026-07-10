@@ -133,7 +133,7 @@ export default function ProjectsGrid({
 
     if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
 
-    const holdDuration = isScrollingRef.current ? 50 : 100;
+    const holdDuration = isScrollingRef.current ? 10 : 100;
     touchTimerRef.current = setTimeout(() => {
       setTouchHeldId(projectId);
     }, holdDuration);
