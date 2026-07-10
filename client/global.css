@@ -27,7 +27,7 @@
   body {
     @apply font-sans;
     color: #1f1714;
-    background-color: #fce7cc;
+    background-color: #e8d4c8;
     background-image: url("/client/images/background_mobile.png");
     background-size: contain;
     background-position: center center;
