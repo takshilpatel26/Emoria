@@ -23,7 +23,8 @@ export default function Loader({ onExit, isExiting = false }: LoaderProps) {
   return (
     <div className={`fixed inset-0 z-50 flex items-center justify-center overflow-hidden text-[#1f1714] transition-opacity duration-1800 ${
       isExiting ? 'opacity-0 pointer-events-none' : 'opacity-100'
-    }`}>
+    }`}
+    style={{ height: '100vh', width: '100vw' }}>
       <style>{`
         @keyframes slowFadeIn {
           0% {
