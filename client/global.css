@@ -25,11 +25,17 @@
     color: #1f1714;
     background-color: #e8d4c8;
     background-image: url("/client/images/background.png");
-    background-size: cover;
+    background-size: contain;
     background-position: center center;
     background-repeat: no-repeat;
-    background-attachment: scroll;
+    background-attachment: fixed;
     min-height: 100vh;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      background-size: cover;
+    }
   }
 
   /* Design tokens for UI component library */
