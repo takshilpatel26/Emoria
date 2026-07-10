@@ -28,13 +28,19 @@
     @apply font-sans;
     color: #1f1714;
     background-color: #e8d4c8;
-    background-image: url("/client/images/background.png");
+    background-image: url("/client/images/background_mobile.png");
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
     background-attachment: fixed;
     min-height: 100vh;
     height: 100%;
+  }
+
+  @media (min-width: 768px) {
+    body {
+      background-image: url("/client/images/background.png");
+    }
   }
 
   /* Design tokens for UI component library */
