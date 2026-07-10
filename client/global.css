@@ -32,7 +32,7 @@
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
+    background-attachment: scroll;
     min-height: 100vh;
     height: 100%;
   }
@@ -40,7 +40,7 @@
   @media (min-width: 768px) {
     body {
       background-image: url("/client/images/background.png");
-      background-size: cover;
+      background-attachment: fixed;
     }
   }
 
