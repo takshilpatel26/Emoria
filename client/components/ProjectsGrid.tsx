@@ -111,6 +111,7 @@ export default function ProjectsGrid({
   const touchStartTimeRef = useRef<number>(0);
   const touchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const touchStartProjectIdRef = useRef<number | null>(null);
+  const isScrollingRef = useRef<boolean>(false);
   const navigate = useNavigate();
 
   const handleMouseEnter = (projectId: number) => {
@@ -132,23 +133,27 @@ export default function ProjectsGrid({
 
     if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
 
+    const holdDuration = isScrollingRef.current ? 50 : 100;
     touchTimerRef.current = setTimeout(() => {
       setTouchHeldId(projectId);
-    }, 100);
+    }, holdDuration);
   };
 
   const handleTouchEnd = (projectId: number) => {
     if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
 
     const touchDuration = Date.now() - touchStartTimeRef.current;
-    const isQuickTap = touchDuration < 500;
+    const isQuickTap = touchDuration < 100;
+    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
 
-    if (isQuickTap && touchHeldId === null) {
+    // On mobile: only navigate on quick tap if not scrolling
+    if (!isDesktop && isQuickTap && !isScrollingRef.current && touchHeldId === null) {
       navigate(`/project/${projectId}`);
     }
 
     setTouchHeldId(null);
     touchStartProjectIdRef.current = null;
+    isScrollingRef.current = false;
     const video = videoRefs.current[projectId];
     if (video) {
       video.pause();
@@ -158,6 +163,8 @@ export default function ProjectsGrid({
 
   const handleTouchMove = (event: React.TouchEvent) => {
     if (!touchStartProjectIdRef.current) return;
+
+    isScrollingRef.current = true;
 
     const touch = event.touches[0];
     const element = document.elementFromPoint(touch.clientX, touch.clientY);
