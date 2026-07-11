@@ -30,8 +30,8 @@
     background-color: #FDEBD3;
     background-image: url("/client/images/background_mobile.png");
     background-size: contain;
-    background-position: center center;
-    background-repeat: no-repeat;
+    background-position: center top;
+    background-repeat: repeat-y;
     background-attachment: fixed;
     min-height: 100vh;
     height: 100%;
@@ -41,6 +41,8 @@
     body {
       background-image: url("/client/images/background.png");
       background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center center;
     }
   }
 
@@ -81,5 +83,31 @@
   code {
     overflow-x: auto;
     white-space: pre;
+  }
+
+  /* Protection Layer Styles */
+  video {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: auto;
+  }
+
+  /* Disable text selection on videos */
+  video::selection {
+    background: transparent;
+  }
+
+  /* Prevent image dragging */
+  img {
+    -webkit-user-drag: none;
+    pointer-events: auto;
+  }
+
+  /* Disable right-click menu appearance */
+  *::selection {
+    user-select: text;
   }
 }
