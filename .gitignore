@@ -27,7 +27,7 @@ dist-ssr
 !.env
 
 public/videos/
-
+HLS/
 node_modules/
 dist/
 .env

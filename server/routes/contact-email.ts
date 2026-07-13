@@ -9,8 +9,6 @@ const ContactSchema = z.object({
   message: z.string().min(1, "Message is required").max(5000),
 });
 
-type ContactRequest = z.infer<typeof ContactSchema>;
-
 let transporter: nodemailer.Transporter | null = null;
 
 function getTransporter() {

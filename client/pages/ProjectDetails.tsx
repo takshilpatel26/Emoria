@@ -1,8 +1,8 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
-import { X } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import SharedVideo from "@/components/SharedVideo";
+import { PROJECT_VIDEO_URLS } from "@/lib/projectVideoUrls";
 
 interface Project {
   id: number;
@@ -17,98 +17,98 @@ const defaultProjects: Project[] = [
     id: 1,
     title: "HOME",
     thumbnail: "/thumbnails/GAURAV_MUNISH.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/GAURAV_MUNISH_FINAL.m4v",
+    video: PROJECT_VIDEO_URLS[0],
     description: "Calm in Chaos. Home was never a place. It was always the person who made the noise disappear.",
   },
   {
     id: 2,
     title: "COLOURS OF SILENCE",
     thumbnail: "/thumbnails/COLORS_OF_SILENCE.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/COLOURS_OF_SILENCE.m4v",
+    video: PROJECT_VIDEO_URLS[1],
     description: "Colours of Silence is about that feeling. The kind of love that doesn't need to perform to be understood. The kind where silence is never empty, because the presence of the other person fills it with every colour words could never describe.",
   },
   {
     id: 3,
     title: "ROLL CALL",
     thumbnail: "/thumbnails/SHIVAM_VAIDEHI.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/SHIVAM_VAIDEHI.m4v",
+    video: PROJECT_VIDEO_URLS[2],
     description: "They once answered the same classroom. Now, they’re answering life together.",
   },
   {
     id: 4,
     title: "DEVOTION",
     thumbnail: "/thumbnails/BAA_BAAPUJI.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/BAA_BAAPUJI.m4v",
+    video: PROJECT_VIDEO_URLS[3],
     description: "Time takes almost everything, but true love refuses to leave.",
   },
   {
     id: 5,
     title: "EVERMORE",
     thumbnail: "/thumbnails/ANJANA_SLVIAN.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/ANJANA_SLVIAN.m4v",
+    video: PROJECT_VIDEO_URLS[4],
     description: "Anjana and Sylvian's big day was wrapped in love. The warmth in the air felt like every puzzle piece had finally found its place. Different traditions and arrangements came together beautifully, giving both families the space to connect, express, and become one.",
   },
   {
     id: 6,
     title: "TWO SIGNATURES",
     thumbnail: "/thumbnails/TWO_SIGNATURES.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/COURT_MARRIAGE.m4v",
+    video: PROJECT_VIDEO_URLS[5],
     description: "A quiet courtroom morning where two hearts chose forever.",
   },
   {
     id: 7,
     title: "THE TWO STATES",
     thumbnail: "/thumbnails/NOOR_RAMU.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/NOOR_RAMU.m4v",
+    video: PROJECT_VIDEO_URLS[6],
     description: "A Gujarati family that got dressed in lungi to attend a South Indian wedding. On the other hand, the South Indian groom became a catalyst to gel up both the families. And in the end everything turned out to be as beautiful as their love is. Language and cultural differences were no more a barrier because both families chose the language of love.",
   },
   {
     id: 8,
     title: "LIFE",
     thumbnail: "/thumbnails/LIFE.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/LIFE.M4V",
+    video: PROJECT_VIDEO_URLS[7],
     description: "Life unfolds through our actions, and the choices we dare to make. A few days ago, in the middle of my work chaos, I crossed paths with a 78-year-old gentleman — a man who has been nurturing his business for 35 years. He has seen the world around him change, evolve, and revolutionize. Yet, his words carry the calm of gratitude, his nature radiates humility, and his heart rests in quiet satisfaction. Filming him felt less like work and more like sitting in a classroom of life — where every smile, every pause, was a lesson. Even at his age, his passion for work and love for family stood tall, teaching me that fulfillment isn't found in success, but in sincerity.",
   },
   {
     id: 9,
     title: "JHOOME",
     thumbnail: "/thumbnails/JHOOME.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/SHIVAM_VAIDEHI_FINAL.m4v",
+    video: PROJECT_VIDEO_URLS[8],
     description: "Every love has a melody. She chose to sing theirs.",
   },
   {
     id: 10,
     title: "AT THE TAJ",
     thumbnail: "/thumbnails/TAJ.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/TAJ.m4v",
+    video: PROJECT_VIDEO_URLS[9],
     description: "Years from now, these frames won’t remind us of the Taj Mahal. They’ll remind us of the way you looked at each other, the silence you shared, and the love that made every moment feel timeless.",
   },
   {
     id: 11,
     title: "HITCHED",
     thumbnail: "/thumbnails/HITCHED.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/HITCHED.m4v",
+    video: PROJECT_VIDEO_URLS[10],
     description: "A lifetime, hand in hand.",
   },
   {
     id: 12,
     title: "BEYOND",
     thumbnail: "/thumbnails/BEYOND.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/DEVOTION.M4V",
+    video: PROJECT_VIDEO_URLS[11],
     description: "Connected where words cannot reach.",
   },
   {
     id: 13,
     title: "BOUND",
     thumbnail: "/thumbnails/BOUND.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/HIMANI_NIHAR.mp4",
+    video: PROJECT_VIDEO_URLS[12],
     description: "Bound in laughter, in silence, in chaos, and in peace.",
   },
   {
     id: 14,
     title: "US",
     thumbnail: "/thumbnails/US.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/JAY_MEETEXA.m4v",
+    video: PROJECT_VIDEO_URLS[13],
     description: "Where forever found its meaning.",
   },
 ];

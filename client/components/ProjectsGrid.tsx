@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SharedVideo from "@/components/SharedVideo";
+import { PROJECT_VIDEO_URLS } from "@/lib/projectVideoUrls";
 
 interface Project {
   id: number;
@@ -18,85 +19,85 @@ const defaultProjects: Project[] = [
     id: 1,
     title: "HOME",
     thumbnail: "/thumbnails/GAURAV_MUNISH.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/GAURAV_MUNISH_FINAL.m4v",
+    video: PROJECT_VIDEO_URLS[0],
   },
   {
     id: 2,
   title: "COLOURS OF SILENCE",
     thumbnail: "/thumbnails/COLORS_OF_SILENCE.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/COLOURS_OF_SILENCE.m4v",
+    video: PROJECT_VIDEO_URLS[1],
   },
   {
     id: 3,
     title: "ROLL CALL",
     thumbnail: "/thumbnails/SHIVAM_VAIDEHI.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/SHIVAM_VAIDEHI.m4v",
+    video: PROJECT_VIDEO_URLS[2],
   },
   {
     id: 4,
     title: "DEVOTION",
     thumbnail: "/thumbnails/BAA_BAAPUJI.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/BAA_BAAPUJI.m4v",
+    video: PROJECT_VIDEO_URLS[3],
   },
   {
     id: 5,
     title: "EVERMORE",
     thumbnail: "/thumbnails/ANJANA_SLVIAN.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/ANJANA_SLVIAN.m4v",
+    video: PROJECT_VIDEO_URLS[4],
   },
   {
     id: 6,
     title: "TWO SIGNATURES",
     thumbnail: "/thumbnails/TWO_SIGNATURES.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/COURT_MARRIAGE.m4v",
+    video: PROJECT_VIDEO_URLS[5],
   },
   {
     id: 7,
     title: "THE TWO STATES",
     thumbnail: "/thumbnails/NOOR_RAMU.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/NOOR_RAMU.m4v",
+    video: PROJECT_VIDEO_URLS[6],
   },
   {
     id: 8,
     title: "LIFE",
     thumbnail: "/thumbnails/LIFE.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/LIFE.M4V",
+    video: PROJECT_VIDEO_URLS[7],
   },
   {
     id: 9,
     title: "JHOOME",
     thumbnail: "/thumbnails/JHOOME.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/SHIVAM_VAIDEHI_FINAL.m4v",
+    video: PROJECT_VIDEO_URLS[8],
   },
   {
     id: 10,
     title: "AT THE TAJ",
     thumbnail: "/thumbnails/TAJ.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/TAJ.m4v",
+    video: PROJECT_VIDEO_URLS[9],
   },
   {
     id: 11,
     title: "HITCHED",
     thumbnail: "/thumbnails/HITCHED.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/HITCHED.m4v",
+    video: PROJECT_VIDEO_URLS[10],
   },
   {
     id: 12,
     title: "BEYOND",
     thumbnail: "/thumbnails/BEYOND.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/DEVOTION.M4V",
+    video: PROJECT_VIDEO_URLS[11],
   },
   {
     id: 13,
     title: "BOUND",
     thumbnail: "/thumbnails/BOUND.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/HIMANI_NIHAR.mp4",
+    video: PROJECT_VIDEO_URLS[12],
   },
   {
     id: 14,
     title: "US",
     thumbnail: "/thumbnails/US.JPEG?w=1600&h=686&fit=crop",
-    video: "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/videos/JAY_MEETEXA.m4v",
+    video: PROJECT_VIDEO_URLS[13],
   },
 ];
 
@@ -104,11 +105,8 @@ export default function ProjectsGrid({
   projects = defaultProjects,
 }: ProjectsGridProps) {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
-  const [inViewIds, setInViewIds] = useState<Set<number>>(new Set());
   const [touchHeldId, setTouchHeldId] = useState<number | null>(null);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
-  const cardRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
-  const observerRef = useRef<IntersectionObserver | null>(null);
   const touchStartTimeRef = useRef<number>(0);
   const touchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const touchStartProjectIdRef = useRef<number | null>(null);
@@ -127,7 +125,7 @@ export default function ProjectsGrid({
     }
   };
 
-  const handleTouchStart = (projectId: number, event: React.TouchEvent) => {
+  const handleTouchStart = (projectId: number) => {
     touchStartTimeRef.current = Date.now();
     touchStartProjectIdRef.current = projectId;
 
@@ -221,41 +219,6 @@ export default function ProjectsGrid({
     });
   }, [projects]);
 
-  useEffect(() => {
-    observerRef.current = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          const projectId = parseInt(entry.target.getAttribute("data-project-id") || "0");
-          if (entry.isIntersecting) {
-            setInViewIds((prev) => new Set(prev).add(projectId));
-          } else {
-            setInViewIds((prev) => {
-              const newSet = new Set(prev);
-              newSet.delete(projectId);
-              return newSet;
-            });
-          }
-        });
-      },
-      { threshold: 0.1 }
-    );
-
-    return () => {
-      if (observerRef.current) {
-        observerRef.current.disconnect();
-      }
-    };
-  }, []);
-
-  useEffect(() => {
-    projects.forEach((project) => {
-      const cardElement = cardRefs.current[project.id];
-      if (cardElement && observerRef.current) {
-        observerRef.current.observe(cardElement);
-      }
-    });
-  }, [projects]);
-
   const shouldShowVideo = (projectId: number) => {
     const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
     return isDesktop ? hoveredId === projectId : touchHeldId === projectId;
@@ -273,14 +236,11 @@ export default function ProjectsGrid({
           {projects.map((project) => (
             <div
               key={project.id}
-              ref={(el) => {
-                if (el) cardRefs.current[project.id] = el;
-              }}
               data-project-id={project.id}
               className="group cursor-pointer"
               onMouseEnter={() => handleMouseEnter(project.id)}
               onMouseLeave={() => handleMouseLeave(project.id)}
-              onTouchStart={(e) => handleTouchStart(project.id, e)}
+              onTouchStart={() => handleTouchStart(project.id)}
               onTouchEnd={() => handleTouchEnd(project.id)}
               onTouchMove={handleTouchMove}
               onClick={() => {

@@ -75,7 +75,6 @@ const defaultProjects: Project[] = [
 export default function CinematicScroll({
   projects = defaultProjects,
 }: CinematicScrollProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
   const navigate = useNavigate();
@@ -94,12 +93,6 @@ export default function CinematicScroll({
     if (video) {
       video.pause();
       video.currentTime = 0;
-    }
-  };
-
-  const handleWheel = (e: React.WheelEvent) => {
-    if (containerRef.current) {
-      containerRef.current.scrollLeft += e.deltaY;
     }
   };
 

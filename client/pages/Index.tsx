@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Loader from "@/components/Loader";
 import ProjectsGrid from "@/components/ProjectsGrid";
@@ -10,6 +9,11 @@ export default function Index() {
   const [isExiting, setIsExiting] = useState(loaderComplete);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showQuote, setShowQuote] = useState(false);
+
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    setIsScrolled(false);
+  }, []);
 
   useEffect(() => {
     if (!loaderComplete) return;
