@@ -14,3 +14,7 @@ export const PROJECT_VIDEO_URLS = [
   "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/HLS/HIMANI_NIHAR/master.m3u8",
   "https://pub-0bd7bc901d3e426cbd77e347452c6dbd.r2.dev/HLS/JAY_MEETEXA/master.m3u8",
 ] as const;
+
+export const HOME_PREVIEW_VIDEO_URLS = PROJECT_VIDEO_URLS.map((url, index) =>
+  index === 11 ? url : url.replace("/master.m3u8", "/1080p/playlist.m3u8")
+);

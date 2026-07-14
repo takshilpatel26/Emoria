@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SharedVideo from "@/components/SharedVideo";
-import { PROJECT_VIDEO_URLS } from "@/lib/projectVideoUrls";
+import { HOME_PREVIEW_VIDEO_URLS } from "@/lib/projectVideoUrls";
 
 interface Project {
   id: number;
@@ -19,85 +19,85 @@ const defaultProjects: Project[] = [
     id: 1,
     title: "HOME",
     thumbnail: "/thumbnails/GAURAV_MUNISH.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[0],
+    video: HOME_PREVIEW_VIDEO_URLS[0],
   },
   {
     id: 2,
   title: "COLOURS OF SILENCE",
     thumbnail: "/thumbnails/COLORS_OF_SILENCE.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[1],
+    video: HOME_PREVIEW_VIDEO_URLS[1],
   },
   {
     id: 3,
     title: "ROLL CALL",
     thumbnail: "/thumbnails/SHIVAM_VAIDEHI.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[2],
+    video: HOME_PREVIEW_VIDEO_URLS[2],
   },
   {
     id: 4,
     title: "DEVOTION",
     thumbnail: "/thumbnails/BAA_BAAPUJI.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[3],
+    video: HOME_PREVIEW_VIDEO_URLS[3],
   },
   {
     id: 5,
     title: "EVERMORE",
     thumbnail: "/thumbnails/ANJANA_SLVIAN.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[4],
+    video: HOME_PREVIEW_VIDEO_URLS[4],
   },
   {
     id: 6,
     title: "TWO SIGNATURES",
     thumbnail: "/thumbnails/TWO_SIGNATURES.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[5],
+    video: HOME_PREVIEW_VIDEO_URLS[5],
   },
   {
     id: 7,
     title: "THE TWO STATES",
     thumbnail: "/thumbnails/NOOR_RAMU.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[6],
+    video: HOME_PREVIEW_VIDEO_URLS[6],
   },
   {
     id: 8,
     title: "LIFE",
     thumbnail: "/thumbnails/LIFE.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[7],
+    video: HOME_PREVIEW_VIDEO_URLS[7],
   },
   {
     id: 9,
     title: "JHOOME",
     thumbnail: "/thumbnails/JHOOME.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[8],
+    video: HOME_PREVIEW_VIDEO_URLS[8],
   },
   {
     id: 10,
     title: "AT THE TAJ",
     thumbnail: "/thumbnails/TAJ.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[9],
+    video: HOME_PREVIEW_VIDEO_URLS[9],
   },
   {
     id: 11,
     title: "HITCHED",
     thumbnail: "/thumbnails/HITCHED.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[10],
+    video: HOME_PREVIEW_VIDEO_URLS[10],
   },
   {
     id: 12,
     title: "BEYOND",
     thumbnail: "/thumbnails/BEYOND.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[11],
+    video: HOME_PREVIEW_VIDEO_URLS[11],
   },
   {
     id: 13,
     title: "BOUND",
     thumbnail: "/thumbnails/BOUND.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[12],
+    video: HOME_PREVIEW_VIDEO_URLS[12],
   },
   {
     id: 14,
     title: "US",
     thumbnail: "/thumbnails/US.JPEG?w=1600&h=686&fit=crop",
-    video: PROJECT_VIDEO_URLS[13],
+    video: HOME_PREVIEW_VIDEO_URLS[13],
   },
 ];
 

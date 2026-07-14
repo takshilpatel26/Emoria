@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { getSharedVideo } from "@/lib/sharedVideoRegistry";
-import { PROJECT_VIDEO_URLS } from "@/lib/projectVideoUrls";
+import { HOME_PREVIEW_VIDEO_URLS } from "@/lib/projectVideoUrls";
 
-const homeVideoUrls = PROJECT_VIDEO_URLS;
+const homeVideoUrls = HOME_PREVIEW_VIDEO_URLS;
 
 export default function VideoPreloader() {
   useEffect(() => {
