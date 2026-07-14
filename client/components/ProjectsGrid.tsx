@@ -266,11 +266,8 @@ export default function ProjectsGrid({
                       mobilePreview={typeof window !== "undefined" && window.innerWidth < 768}
                       onVideoReady={(video) => {
                         videoRefs.current[project.id] = video;
-                        if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
-                          setReadyIds((prev) => new Set(prev).add(project.id));
-                        }
                       }}
-                      onLoadedData={() => {
+                      onPlaying={() => {
                         setReadyIds((prev) => new Set(prev).add(project.id));
                       }}
                       onContextMenu={handleVideoContextMenu}

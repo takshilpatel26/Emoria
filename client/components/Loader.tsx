@@ -65,7 +65,7 @@ export default function Loader({ onExit, isExiting = false, previewsReady = true
         }
 
         .emoria-text {
-          animation: slowFadeIn 3.5s ease-in-out forwards;
+          animation: slowFadeIn 5s ease-in-out forwards;
           font-family: 'Carlton Std', serif;
           font-weight: 400;
           letter-spacing: 0.08em;

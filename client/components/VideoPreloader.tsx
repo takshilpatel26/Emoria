@@ -37,6 +37,7 @@ export default function VideoPreloader() {
   useEffect(() => {
     let nextIndex = 0;
     let timeoutId: number | undefined;
+    let disposed = false;
     const mobilePreview = window.innerWidth < 768;
 
     if (!mobilePreview) {
@@ -53,18 +54,25 @@ export default function VideoPreloader() {
 
     const prepareMobilePriorityPreviews = async () => {
       const priorityVideos = homeVideoUrls.slice(0, 5).map((url) =>
-        getSharedVideo(url, { mobilePreview })
+        getSharedVideo(url, { mobilePreview, mobileBufferSeconds: 12 })
       );
       await Promise.all(priorityVideos.map((video) => waitForInitialBuffer(video, 10)));
+      if (disposed) return;
+
       setHomePreviewsReady(true);
+      for (const url of homeVideoUrls.slice(5)) {
+        getSharedVideo(url, { mobilePreview, mobileBufferSeconds: 7 });
+      }
     };
 
     if (mobilePreview) {
       void prepareMobilePriorityPreviews();
+    } else {
+      preloadNext();
     }
-    preloadNext();
 
     return () => {
+      disposed = true;
       if (timeoutId !== undefined) window.clearTimeout(timeoutId);
     };
   }, [setHomePreviewsReady]);

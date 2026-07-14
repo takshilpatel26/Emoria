@@ -10,6 +10,7 @@ interface SharedVideoProps {
   poster?: string;
   onLoadedData?: () => void;
   onCanPlay?: () => void;
+  onPlaying?: () => void;
   onEnded?: () => void;
   onContextMenu?: (event: React.MouseEvent<HTMLVideoElement>) => void;
   onVideoReady?: (video: HTMLVideoElement) => void;
@@ -25,14 +26,15 @@ export default function SharedVideo({
   poster,
   onLoadedData,
   onCanPlay,
+  onPlaying,
   onEnded,
   onContextMenu,
   onVideoReady,
   mobilePreview = false,
 }: SharedVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const callbacksRef = useRef({ onLoadedData, onCanPlay, onEnded, onContextMenu });
-  callbacksRef.current = { onLoadedData, onCanPlay, onEnded, onContextMenu };
+  const callbacksRef = useRef({ onLoadedData, onCanPlay, onPlaying, onEnded, onContextMenu });
+  callbacksRef.current = { onLoadedData, onCanPlay, onPlaying, onEnded, onContextMenu };
 
   useEffect(() => {
     const container = containerRef.current;
@@ -41,6 +43,7 @@ export default function SharedVideo({
     const video = getSharedVideo(src, { mobilePreview });
     const handleLoadedData = () => callbacksRef.current.onLoadedData?.();
     const handleCanPlay = () => callbacksRef.current.onCanPlay?.();
+    const handlePlaying = () => callbacksRef.current.onPlaying?.();
     const handleEnded = () => callbacksRef.current.onEnded?.();
     const handleContextMenu = (event: Event) => {
       callbacksRef.current.onContextMenu?.(event as unknown as React.MouseEvent<HTMLVideoElement>);
@@ -48,6 +51,7 @@ export default function SharedVideo({
 
     video.addEventListener("loadeddata", handleLoadedData);
     video.addEventListener("canplay", handleCanPlay);
+    video.addEventListener("playing", handlePlaying);
     video.addEventListener("ended", handleEnded);
     container.addEventListener("contextmenu", handleContextMenu);
     container.replaceChildren(video);
@@ -57,6 +61,7 @@ export default function SharedVideo({
       video.pause();
       video.removeEventListener("loadeddata", handleLoadedData);
       video.removeEventListener("canplay", handleCanPlay);
+      video.removeEventListener("playing", handlePlaying);
       video.removeEventListener("ended", handleEnded);
       container.removeEventListener("contextmenu", handleContextMenu);
     };

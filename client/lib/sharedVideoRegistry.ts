@@ -5,10 +5,11 @@ const hlsInstances = new Map<string, Hls>();
 
 interface SharedVideoOptions {
   mobilePreview?: boolean;
+  mobileBufferSeconds?: number;
 }
 
 export function getSharedVideo(src: string, options: SharedVideoOptions = {}) {
-  const { mobilePreview = false } = options;
+  const { mobilePreview = false, mobileBufferSeconds } = options;
   const existing = videos.get(src);
   if (existing) return existing;
 
@@ -31,8 +32,8 @@ export function getSharedVideo(src: string, options: SharedVideoOptions = {}) {
         autoStartLoad: true,
         startLevel: mobilePreview ? 0 : -1,
         capLevelToPlayerSize: mobilePreview,
-        maxBufferLength: mobilePreview ? 12 : 30,
-        maxMaxBufferLength: mobilePreview ? 12 : 30,
+        maxBufferLength: mobilePreview ? mobileBufferSeconds ?? 12 : 30,
+        maxMaxBufferLength: mobilePreview ? mobileBufferSeconds ?? 12 : 30,
         backBufferLength: mobilePreview ? 24 : 90,
       });
 
