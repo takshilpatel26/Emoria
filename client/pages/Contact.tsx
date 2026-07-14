@@ -35,6 +35,14 @@ export default function Contact() {
     message: string;
   }>({ type: null, message: "" });
 
+  useEffect(() => {
+    if (submitStatus.type) {
+      const statusElement = document.getElementById("contact-status");
+      statusElement?.scrollIntoView({ behavior: "smooth", block: "center" });
+      statusElement?.focus();
+    }
+  }, [submitStatus.type]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -101,19 +109,6 @@ export default function Contact() {
                 together.
               </p>
             </div>
-
-            {submitStatus.type && (
-              <div
-                className={`p-4 rounded-lg mb-8 ${
-                  submitStatus.type === "success"
-                    ? "bg-green-100 text-green-800 border border-green-300"
-                    : "bg-red-100 text-red-800 border border-red-300"
-                }`}
-                style={{ fontFamily: "Ubuntu, sans-serif" }}
-              >
-                {submitStatus.message}
-              </div>
-            )}
 
             <form onSubmit={handleSubmit} className="space-y-8">
               <div>
@@ -189,6 +184,30 @@ export default function Contact() {
                 {isLoading ? "Sending..." : "Send Message"}
               </button>
             </form>
+
+            {submitStatus.type && (
+              <div
+                id="contact-status"
+                className="p-5 rounded-lg mt-6"
+                role="alert"
+                aria-live="assertive"
+                tabIndex={-1}
+                style={{
+                  fontFamily: "Ubuntu, sans-serif",
+                  fontSize: "1.05rem",
+                  fontWeight: 500,
+                  backgroundColor:
+                    submitStatus.type === "success" ? "#dcfce7" : "#fee2e2",
+                  color: submitStatus.type === "success" ? "#166534" : "#991b1b",
+                  border: `1px solid ${
+                    submitStatus.type === "success" ? "#86efac" : "#fca5a5"
+                  }`,
+                  boxShadow: "0 8px 24px rgba(31, 23, 20, 0.12)",
+                }}
+              >
+                {submitStatus.message}
+              </div>
+            )}
 
             <div className="mt-20 pt-12 border-t border-[#1f1714]/20">
               <h3 className="text-2xl font-serif font-bold mb-8 text-[#1f1714]">Other Ways to Reach Us</h3>
