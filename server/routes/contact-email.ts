@@ -91,9 +91,14 @@ export const handleContactEmail: RequestHandler = async (req, res) => {
     }
 
     console.error("Email error:", error);
-    res.status(500).json({
+    const isConfigurationError =
+      error instanceof Error && error.message.includes("credentials not configured");
+
+    res.status(isConfigurationError ? 503 : 502).json({
       success: false,
-      message: "Failed to send email. Please try again later.",
+      message: isConfigurationError
+        ? "Email service is not configured. Please try again later."
+        : "Email service could not send the message. Please try again later.",
     });
   }
 };
