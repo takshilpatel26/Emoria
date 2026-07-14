@@ -6,6 +6,7 @@ export default function Contact() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
+    phone: "",
     subject: "",
     message: "",
   });
@@ -71,7 +72,7 @@ export default function Contact() {
         type: "success",
         message: "Message sent successfully! We'll get back to you soon.",
       });
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
     } catch (error) {
       setSubmitStatus({
         type: "error",
@@ -138,6 +139,23 @@ export default function Contact() {
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  className="w-full bg-transparent border border-[#1f1714]/30 text-[#1f1714] px-6 py-3 focus:outline-none focus:border-[#1f1714] transition-colors placeholder:text-[#1f1714]/40"
+                  style={{ fontFamily: 'Ubuntu, sans-serif' }}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="phone" className="block text-sm uppercase tracking-widest mb-3 text-[#1f1714]" style={{ fontFamily: 'Ubuntu, sans-serif' }}>
+                  Contact Number
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  required
+                  autoComplete="tel"
                   className="w-full bg-transparent border border-[#1f1714]/30 text-[#1f1714] px-6 py-3 focus:outline-none focus:border-[#1f1714] transition-colors placeholder:text-[#1f1714]/40"
                   style={{ fontFamily: 'Ubuntu, sans-serif' }}
                 />

@@ -5,6 +5,7 @@ import type { RequestHandler } from "express";
 const ContactSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   email: z.string().email("Invalid email address"),
+  phone: z.string().min(7, "Contact number is required").max(30),
   subject: z.string().min(1, "Subject is required").max(200),
   message: z.string().min(1, "Message is required").max(5000),
 });
@@ -50,6 +51,7 @@ export async function sendContactEmail(input: unknown) {
   const emailTransporter = getTransporter();
   const name = escapeHtml(body.name);
   const email = escapeHtml(body.email);
+  const phone = escapeHtml(body.phone);
   const subject = escapeHtml(body.subject);
   const message = escapeHtml(body.message);
 
@@ -63,6 +65,7 @@ export async function sendContactEmail(input: unknown) {
         <div style="border-top: 1px solid #ddd; padding-top: 20px; margin-top: 20px;">
           <p><strong>Name:</strong> ${name}</p>
           <p><strong>Email:</strong> ${email}</p>
+          <p><strong>Contact Number:</strong> ${phone}</p>
           <p><strong>Subject:</strong> ${subject}</p>
           <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;" />
           <h3>Message:</h3>
