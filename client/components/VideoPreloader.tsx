@@ -56,7 +56,7 @@ export default function VideoPreloader() {
       const priorityVideos = homeVideoUrls.slice(0, 5).map((url) =>
         getSharedVideo(url, { mobilePreview, mobileBufferSeconds: 12 })
       );
-      await Promise.all(priorityVideos.map((video) => waitForInitialBuffer(video, 10)));
+      await Promise.all(priorityVideos.map((video) => waitForInitialBuffer(video, 6)));
       if (disposed) return;
 
       setHomePreviewsReady(true);

@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SharedVideo from "@/components/SharedVideo";
 import { HOME_PREVIEW_VIDEO_URLS } from "@/lib/projectVideoUrls";
+import { prioritizeSharedVideo } from "@/lib/sharedVideoRegistry";
 
 interface Project {
   id: number;
@@ -106,7 +107,6 @@ export default function ProjectsGrid({
 }: ProjectsGridProps) {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [touchHeldId, setTouchHeldId] = useState<number | null>(null);
-  const [readyIds, setReadyIds] = useState<Set<number>>(new Set());
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
   const touchStartTimeRef = useRef<number>(0);
   const touchTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -187,7 +187,9 @@ export default function ProjectsGrid({
 
   useEffect(() => {
     if (touchHeldId !== null) {
+      const project = projects.find((item) => item.id === touchHeldId);
       const video = videoRefs.current[touchHeldId];
+      if (project?.video) prioritizeSharedVideo(project.video);
       if (video) {
         video.currentTime = 0;
         video.play().catch(() => {});
@@ -251,7 +253,7 @@ export default function ProjectsGrid({
             >
               <div className="overflow-hidden rounded-lg">
                 <div className="aspect-video w-full bg-[#1f1714]/5 relative">
-                  {(!shouldShowVideo(project.id) || !readyIds.has(project.id)) && (
+                  {!shouldShowVideo(project.id) && (
                     <img
                       src={project.thumbnail}
                       alt={project.title}
@@ -266,9 +268,6 @@ export default function ProjectsGrid({
                       mobilePreview={typeof window !== "undefined" && window.innerWidth < 768}
                       onVideoReady={(video) => {
                         videoRefs.current[project.id] = video;
-                      }}
-                      onPlaying={() => {
-                        setReadyIds((prev) => new Set(prev).add(project.id));
                       }}
                       onContextMenu={handleVideoContextMenu}
                     />
