@@ -2,38 +2,49 @@ import type { IncomingMessage, ServerResponse } from "node:http";
 import nodemailer from "nodemailer";
 
 export default async function handler(
-  req: IncomingMessage,
+  req: IncomingMessage & { body?: any },
   res: ServerResponse
 ) {
-  try {
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.GMAIL_EMAIL,
-        pass: process.env.GMAIL_PASSWORD,
-      },
-    });
-
-    await transporter.sendMail({
-      from: process.env.GMAIL_EMAIL,
-      to: process.env.GMAIL_EMAIL,
-      subject: "Emoria Test Email",
-      text: "If you received this email, Nodemailer is working.",
-    });
-
-    res.statusCode = 200;
-    res.setHeader("Content-Type", "application/json");
-    res.end(JSON.stringify({ ok: true }));
-  } catch (err) {
-    console.error(err);
-
-    res.statusCode = 500;
-    res.setHeader("Content-Type", "application/json");
-    res.end(
-      JSON.stringify({
-        ok: false,
-        error: err instanceof Error ? err.message : String(err),
-      })
-    );
+  if (req.method !== "POST") {
+    res.statusCode = 405;
+    return res.end();
   }
+
+  const { name, email, subject, message } = req.body;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.GMAIL_EMAIL,
+      pass: process.env.GMAIL_PASSWORD,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.GMAIL_EMAIL,
+    to: process.env.GMAIL_EMAIL,
+    subject: `Contact Form: ${subject}`,
+    html: `
+      <h2>New Contact Form Submission</h2>
+
+      <p><b>Name:</b> ${name}</p>
+
+      <p><b>Email:</b> ${email}</p>
+
+      <p><b>Subject:</b> ${subject}</p>
+
+      <p><b>Message:</b></p>
+
+      <p>${message}</p>
+    `,
+    replyTo: email,
+  });
+
+  res.statusCode = 200;
+
+  res.setHeader("Content-Type", "application/json");
+
+  res.end(JSON.stringify({
+    success: true
+  }));
 }
