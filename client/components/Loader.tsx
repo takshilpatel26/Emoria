@@ -86,6 +86,24 @@ export default function Loader({ onExit, isExiting = false, previewsReady = true
           border-color: rgba(31, 23, 20, 0.75);
           color: #1f1714;
         }
+
+        .preload-status {
+          animation: slowFadeIn 1s ease-out forwards;
+          font-family: 'Ubuntu', sans-serif;
+          letter-spacing: 0.12em;
+        }
+
+        .preload-dots::after {
+          content: '';
+          animation: preloadDots 1.4s steps(4, end) infinite;
+        }
+
+        @keyframes preloadDots {
+          0%, 20% { content: ''; }
+          40% { content: '.'; }
+          60% { content: '..'; }
+          80%, 100% { content: '...'; }
+        }
       `}</style>
 
       <div className="relative z-10 flex flex-col items-center justify-center gap-0">
@@ -102,6 +120,12 @@ export default function Loader({ onExit, isExiting = false, previewsReady = true
         </div>
 
         {/* Enter button - appears after initial animation completes */}
+        {showButton && !isExiting && !previewsReady && (
+          <div className="preload-status mt-8 text-[10px] uppercase opacity-70">
+            Preparing previews<span className="preload-dots" />
+          </div>
+        )}
+
         {showButton && !isExiting && previewsReady && (
           <button
             onClick={handleEnter}
