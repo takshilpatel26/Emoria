@@ -47,10 +47,16 @@ export default function Contact() {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get("content-type") ?? "";
+      const data = contentType.includes("application/json")
+        ? await response.json()
+        : null;
 
       if (!response.ok) {
-        throw new Error(data.message || "Failed to send message");
+        throw new Error(
+          data?.message ||
+            `Unable to send message (server returned ${response.status}). Please try again later.`,
+        );
       }
 
       setSubmitStatus({
