@@ -70,6 +70,10 @@ export function prioritizeSharedVideo(src: string) {
   hlsInstances.get(src)?.startLoad();
 }
 
+export function stopSharedVideo(src: string) {
+  hlsInstances.get(src)?.stopLoad();
+}
+
 export function destroySharedVideos() {
   hlsInstances.forEach((hls) => hls.destroy());
   videos.forEach((video) => {

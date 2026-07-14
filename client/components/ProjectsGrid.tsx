@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SharedVideo from "@/components/SharedVideo";
 import { HOME_PREVIEW_VIDEO_URLS } from "@/lib/projectVideoUrls";
-import { prioritizeSharedVideo } from "@/lib/sharedVideoRegistry";
+import { prioritizeSharedVideo, stopSharedVideo } from "@/lib/sharedVideoRegistry";
 
 interface Project {
   id: number;
@@ -157,6 +157,10 @@ export default function ProjectsGrid({
     if (video) {
       video.pause();
     }
+    if (!isDesktop) {
+      const project = projects.find((item) => item.id === projectId);
+      if (project?.video) stopSharedVideo(project.video);
+    }
   };
 
   const handleTouchMove = (event: React.TouchEvent) => {
@@ -260,18 +264,26 @@ export default function ProjectsGrid({
                       className="w-full h-full object-cover absolute inset-0 z-10"
                     />
                   )}
-                  {project.video && (
-                    <SharedVideo
-                      src={project.video}
-                      className="w-full h-full object-cover"
-                      muted
-                      mobilePreview={typeof window !== "undefined" && window.innerWidth < 768}
-                      onVideoReady={(video) => {
-                        videoRefs.current[project.id] = video;
-                      }}
-                      onContextMenu={handleVideoContextMenu}
-                    />
-                  )}
+                  {project.video &&
+                    (typeof window === "undefined" ||
+                      window.innerWidth >= 768 ||
+                      touchHeldId === project.id) && (
+                      <SharedVideo
+                        src={project.video}
+                        className="w-full h-full object-cover"
+                        muted
+                        mobilePreview={typeof window !== "undefined" && window.innerWidth < 768}
+                        onVideoReady={(video) => {
+                          videoRefs.current[project.id] = video;
+                          if (touchHeldId === project.id) {
+                            prioritizeSharedVideo(project.video!);
+                            video.currentTime = 0;
+                            video.play().catch(() => {});
+                          }
+                        }}
+                        onContextMenu={handleVideoContextMenu}
+                      />
+                    )}
                 </div>
               </div>
               <h3 className="text-xl md:text-2xl font-serif font-thin mt-2 text-center group-hover:opacity-70 transition-opacity duration-300">
