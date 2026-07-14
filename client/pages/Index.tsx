@@ -5,7 +5,7 @@ import ProjectsGrid from "@/components/ProjectsGrid";
 import { useLoader } from "@/context/LoaderContext";
 
 export default function Index() {
-  const { loaderComplete, setLoaderComplete } = useLoader();
+  const { loaderComplete, setLoaderComplete, homePreviewsReady } = useLoader();
   const [isExiting, setIsExiting] = useState(loaderComplete);
   const [isScrolled, setIsScrolled] = useState(false);
   const [showQuote, setShowQuote] = useState(false);
@@ -42,7 +42,13 @@ export default function Index() {
 
   return (
     <>
-      {!loaderComplete && <Loader onExit={handleLoaderExit} isExiting={isExiting} />}
+      {!loaderComplete && (
+        <Loader
+          onExit={handleLoaderExit}
+          isExiting={isExiting}
+          previewsReady={homePreviewsReady}
+        />
+      )}
       
       {/* Home page - fades in during loader transition */}
       <div className={`min-h-screen bg-transparent text-[#1f1714] flex flex-col transition-opacity duration-1800 ${

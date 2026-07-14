@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 interface LoaderProps {
   onExit?: (isExiting: boolean) => void;
   isExiting?: boolean;
+  previewsReady?: boolean;
 }
 
-export default function Loader({ onExit, isExiting = false }: LoaderProps) {
+export default function Loader({ onExit, isExiting = false, previewsReady = true }: LoaderProps) {
   const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
@@ -101,7 +102,7 @@ export default function Loader({ onExit, isExiting = false }: LoaderProps) {
         </div>
 
         {/* Enter button - appears after initial animation completes */}
-        {showButton && !isExiting && (
+        {showButton && !isExiting && previewsReady && (
           <button
             onClick={handleEnter}
             className="enter-button px-6 md:px-12 py-2 md:py-4 border text-xs tracking-widest uppercase hover:bg-[#1f1714] hover:text-[#ead3c5] transition-all duration-300 mt-8 md:mt-12"

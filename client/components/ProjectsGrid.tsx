@@ -106,6 +106,7 @@ export default function ProjectsGrid({
 }: ProjectsGridProps) {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
   const [touchHeldId, setTouchHeldId] = useState<number | null>(null);
+  const [readyIds, setReadyIds] = useState<Set<number>>(new Set());
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
   const touchStartTimeRef = useRef<number>(0);
   const touchTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -250,7 +251,7 @@ export default function ProjectsGrid({
             >
               <div className="overflow-hidden rounded-lg">
                 <div className="aspect-video w-full bg-[#1f1714]/5 relative">
-                  {!shouldShowVideo(project.id) && (
+                  {(!shouldShowVideo(project.id) || !readyIds.has(project.id)) && (
                     <img
                       src={project.thumbnail}
                       alt={project.title}
@@ -265,6 +266,12 @@ export default function ProjectsGrid({
                       mobilePreview={typeof window !== "undefined" && window.innerWidth < 768}
                       onVideoReady={(video) => {
                         videoRefs.current[project.id] = video;
+                        if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+                          setReadyIds((prev) => new Set(prev).add(project.id));
+                        }
+                      }}
+                      onLoadedData={() => {
+                        setReadyIds((prev) => new Set(prev).add(project.id));
                       }}
                       onContextMenu={handleVideoContextMenu}
                     />
