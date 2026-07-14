@@ -13,6 +13,7 @@ interface SharedVideoProps {
   onEnded?: () => void;
   onContextMenu?: (event: React.MouseEvent<HTMLVideoElement>) => void;
   onVideoReady?: (video: HTMLVideoElement) => void;
+  mobilePreview?: boolean;
 }
 
 export default function SharedVideo({
@@ -27,6 +28,7 @@ export default function SharedVideo({
   onEnded,
   onContextMenu,
   onVideoReady,
+  mobilePreview = false,
 }: SharedVideoProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const callbacksRef = useRef({ onLoadedData, onCanPlay, onEnded, onContextMenu });
@@ -36,7 +38,7 @@ export default function SharedVideo({
     const container = containerRef.current;
     if (!container) return;
 
-    const video = getSharedVideo(src);
+    const video = getSharedVideo(src, { mobilePreview });
     const handleLoadedData = () => callbacksRef.current.onLoadedData?.();
     const handleCanPlay = () => callbacksRef.current.onCanPlay?.();
     const handleEnded = () => callbacksRef.current.onEnded?.();
@@ -58,17 +60,17 @@ export default function SharedVideo({
       video.removeEventListener("ended", handleEnded);
       container.removeEventListener("contextmenu", handleContextMenu);
     };
-  }, [src]);
+  }, [src, mobilePreview]);
 
   useEffect(() => {
-    const video = getSharedVideo(src);
+    const video = getSharedVideo(src, { mobilePreview });
     video.className = className || "";
     video.controls = controls;
     video.muted = muted;
     video.loop = loop;
     video.playsInline = true;
     video.poster = poster || "";
-  }, [src, className, controls, loop, muted, poster]);
+  }, [src, className, controls, loop, muted, poster, mobilePreview]);
 
   return <div ref={containerRef} className="contents" />;
 }

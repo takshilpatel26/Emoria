@@ -3,7 +3,12 @@ import Hls from "hls.js";
 const videos = new Map<string, HTMLVideoElement>();
 const hlsInstances = new Map<string, Hls>();
 
-export function getSharedVideo(src: string) {
+interface SharedVideoOptions {
+  mobilePreview?: boolean;
+}
+
+export function getSharedVideo(src: string, options: SharedVideoOptions = {}) {
+  const { mobilePreview = false } = options;
   const existing = videos.get(src);
   if (existing) return existing;
 
@@ -24,8 +29,11 @@ export function getSharedVideo(src: string) {
         enableWorker: true,
         lowLatencyMode: false,
         autoStartLoad: true,
-        maxBufferLength: 30,
-        backBufferLength: 90,
+        startLevel: mobilePreview ? 0 : -1,
+        capLevelToPlayerSize: mobilePreview,
+        maxBufferLength: mobilePreview ? 12 : 30,
+        maxMaxBufferLength: mobilePreview ? 12 : 30,
+        backBufferLength: mobilePreview ? 24 : 90,
       });
 
       hls.on(Hls.Events.ERROR, (_event, data) => {

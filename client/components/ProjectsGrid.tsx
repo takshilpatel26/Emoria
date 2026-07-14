@@ -262,6 +262,7 @@ export default function ProjectsGrid({
                       src={project.video}
                       className="w-full h-full object-cover"
                       muted
+                      mobilePreview={typeof window !== "undefined" && window.innerWidth < 768}
                       onVideoReady={(video) => {
                         videoRefs.current[project.id] = video;
                       }}
