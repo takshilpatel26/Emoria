@@ -14,16 +14,16 @@ export default async function handler(
       },
     });
 
-    const verified = await transporter.verify();
+    await transporter.sendMail({
+      from: process.env.GMAIL_EMAIL,
+      to: process.env.GMAIL_EMAIL,
+      subject: "Emoria Test Email",
+      text: "If you received this email, Nodemailer is working.",
+    });
 
     res.statusCode = 200;
     res.setHeader("Content-Type", "application/json");
-    res.end(
-      JSON.stringify({
-        ok: true,
-        verified,
-      })
-    );
+    res.end(JSON.stringify({ ok: true }));
   } catch (err) {
     console.error(err);
 
