@@ -91,14 +91,21 @@ export const handleContactEmail: RequestHandler = async (req, res) => {
     }
 
     console.error("Email error:", error);
+    const errorCode =
+      error && typeof error === "object" && "code" in error
+        ? String(error.code)
+        : undefined;
     const isConfigurationError =
       error instanceof Error && error.message.includes("credentials not configured");
+    const isAuthenticationError = errorCode === "EAUTH";
 
     res.status(isConfigurationError ? 503 : 502).json({
       success: false,
       message: isConfigurationError
         ? "Email service is not configured. Please try again later."
-        : "Email service could not send the message. Please try again later.",
+        : isAuthenticationError
+          ? "Email service rejected the configured credentials. Please verify the Gmail app password."
+          : "Email service could not send the message. Please try again later.",
     });
   }
 };
