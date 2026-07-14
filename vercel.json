@@ -2,17 +2,14 @@
   "buildCommand": "pnpm build:client",
   "outputDirectory": "dist/spa",
   "installCommand": "pnpm install --frozen-lockfile",
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/[...path]"
+      "source": "/api/:path*",
+      "destination": "/api/[...path]"
     },
     {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
