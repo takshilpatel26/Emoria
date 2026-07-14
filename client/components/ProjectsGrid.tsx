@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SharedVideo from "@/components/SharedVideo";
 import { HOME_PREVIEW_VIDEO_URLS } from "@/lib/projectVideoUrls";
@@ -106,12 +106,9 @@ export default function ProjectsGrid({
   projects = defaultProjects,
 }: ProjectsGridProps) {
   const [hoveredId, setHoveredId] = useState<number | null>(null);
-  const [touchHeldId, setTouchHeldId] = useState<number | null>(null);
+  const [activeMobileProjectId, setActiveMobileProjectId] = useState<number | null>(null);
   const videoRefs = useRef<{ [key: number]: HTMLVideoElement | null }>({});
-  const touchStartTimeRef = useRef<number>(0);
-  const touchTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const touchStartProjectIdRef = useRef<number | null>(null);
-  const isScrollingRef = useRef<boolean>(false);
+  const cardRefs = useRef<{ [key: number]: HTMLDivElement | null }>({});
   const navigate = useNavigate();
 
   const handleMouseEnter = (projectId: number) => {
@@ -126,58 +123,49 @@ export default function ProjectsGrid({
     }
   };
 
-  const handleTouchStart = (projectId: number) => {
-    touchStartTimeRef.current = Date.now();
-    touchStartProjectIdRef.current = projectId;
+  useEffect(() => {
+    const updateActiveProject = () => {
+      if (window.innerWidth >= 768) {
+        setActiveMobileProjectId(null);
+        return;
+      }
 
-    if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
+      const viewportCenter = window.innerHeight / 2;
+      let closestProjectId: number | null = null;
+      let closestDistance = Number.POSITIVE_INFINITY;
 
-    const holdDuration = isScrollingRef.current ? 10 : 100;
-    touchTimerRef.current = setTimeout(() => {
-      setTouchHeldId(projectId);
-    }, holdDuration);
-  };
+      projects.forEach((project) => {
+        const card = cardRefs.current[project.id];
+        if (!card) return;
 
-  const handleTouchEnd = (projectId: number) => {
-    if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
+        const bounds = card.getBoundingClientRect();
+        const distance = Math.abs(bounds.top + bounds.height / 2 - viewportCenter);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestProjectId = project.id;
+        }
+      });
 
-    const touchDuration = Date.now() - touchStartTimeRef.current;
-    const isQuickTap = touchDuration < 100;
-    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
+      setActiveMobileProjectId((currentId) =>
+        currentId === closestProjectId ? currentId : closestProjectId,
+      );
+    };
 
-    // On mobile: only navigate on quick tap if not scrolling
-    if (!isDesktop && isQuickTap && !isScrollingRef.current && touchHeldId === null) {
-      navigate(`/project/${projectId}`);
-    }
+    let frameId = requestAnimationFrame(updateActiveProject);
+    const handleViewportChange = () => {
+      cancelAnimationFrame(frameId);
+      frameId = requestAnimationFrame(updateActiveProject);
+    };
 
-    setTouchHeldId(null);
-    touchStartProjectIdRef.current = null;
-    isScrollingRef.current = false;
-    const video = videoRefs.current[projectId];
-    if (video) {
-      video.pause();
-    }
-    if (!isDesktop) {
-      const project = projects.find((item) => item.id === projectId);
-      if (project?.video) stopSharedVideo(project.video);
-    }
-  };
+    window.addEventListener("scroll", handleViewportChange, { passive: true });
+    window.addEventListener("resize", handleViewportChange);
 
-  const handleTouchMove = (event: React.TouchEvent) => {
-    if (!touchStartProjectIdRef.current) return;
-
-    isScrollingRef.current = true;
-
-    const touch = event.touches[0];
-    const element = document.elementFromPoint(touch.clientX, touch.clientY);
-    const cardElement = element?.closest('[data-project-id]') as HTMLElement | null;
-    const currentProjectId = cardElement ? parseInt(cardElement.getAttribute('data-project-id') || '0') : null;
-
-    if (currentProjectId !== touchStartProjectIdRef.current) {
-      if (touchTimerRef.current) clearTimeout(touchTimerRef.current);
-      setTouchHeldId(null);
-    }
-  };
+    return () => {
+      cancelAnimationFrame(frameId);
+      window.removeEventListener("scroll", handleViewportChange);
+      window.removeEventListener("resize", handleViewportChange);
+    };
+  }, [projects]);
 
   useEffect(() => {
     if (hoveredId !== null) {
@@ -190,32 +178,38 @@ export default function ProjectsGrid({
   }, [hoveredId]);
 
   useEffect(() => {
-    if (touchHeldId !== null) {
-      const project = projects.find((item) => item.id === touchHeldId);
-      const video = videoRefs.current[touchHeldId];
-      if (project?.video) prioritizeSharedVideo(project.video);
-      if (video) {
-        video.currentTime = 0;
-        video.play().catch(() => {});
-      }
+    if (activeMobileProjectId === null) return;
+
+    const project = projects.find((item) => item.id === activeMobileProjectId);
+    if (!project?.video) return;
+
+    prioritizeSharedVideo(project.video);
+    const video = videoRefs.current[activeMobileProjectId];
+    if (video) {
+      video.currentTime = 0;
+      video.play().catch(() => {});
     }
-  }, [touchHeldId]);
+
+    return () => {
+      video?.pause();
+      stopSharedVideo(project.video!);
+    };
+  }, [activeMobileProjectId, projects]);
 
   useEffect(() => {
     projects.forEach((project) => {
       const video = videoRefs.current[project.id];
-      if (!video) return;
+      if (!video || window.innerWidth < 768) return;
 
-      const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
-      const shouldPlay = isDesktop ? hoveredId === project.id : touchHeldId === project.id;
-
+      const shouldPlay = hoveredId === project.id;
       if (shouldPlay && video.paused) {
+        video.currentTime = 0;
         video.play().catch(() => {});
       } else if (!shouldPlay && !video.paused) {
         video.pause();
       }
     });
-  }, [hoveredId, touchHeldId, projects]);
+  }, [hoveredId, projects]);
 
   useEffect(() => {
     projects.forEach((project) => {
@@ -227,8 +221,8 @@ export default function ProjectsGrid({
   }, [projects]);
 
   const shouldShowVideo = (projectId: number) => {
-    const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
-    return isDesktop ? hoveredId === projectId : touchHeldId === projectId;
+    const isDesktop = typeof window !== "undefined" && window.innerWidth >= 768;
+    return isDesktop ? hoveredId === projectId : activeMobileProjectId === projectId;
   };
 
   const handleVideoContextMenu = (e: React.MouseEvent) => {
@@ -247,13 +241,10 @@ export default function ProjectsGrid({
               className="group cursor-pointer"
               onMouseEnter={() => handleMouseEnter(project.id)}
               onMouseLeave={() => handleMouseLeave(project.id)}
-              onTouchStart={() => handleTouchStart(project.id)}
-              onTouchEnd={() => handleTouchEnd(project.id)}
-              onTouchMove={handleTouchMove}
-              onClick={() => {
-                const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768;
-                if (isDesktop) navigate(`/project/${project.id}`);
+              ref={(element) => {
+                cardRefs.current[project.id] = element;
               }}
+              onClick={() => navigate(`/project/${project.id}`)}
             >
               <div className="overflow-hidden rounded-lg">
                 <div className="aspect-video w-full bg-[#1f1714]/5 relative">
@@ -267,7 +258,7 @@ export default function ProjectsGrid({
                   {project.video &&
                     (typeof window === "undefined" ||
                       window.innerWidth >= 768 ||
-                      touchHeldId === project.id) && (
+                      activeMobileProjectId === project.id) && (
                       <SharedVideo
                         src={project.video}
                         className="w-full h-full object-cover"
@@ -275,7 +266,7 @@ export default function ProjectsGrid({
                         mobilePreview={typeof window !== "undefined" && window.innerWidth < 768}
                         onVideoReady={(video) => {
                           videoRefs.current[project.id] = video;
-                          if (touchHeldId === project.id) {
+                          if (activeMobileProjectId === project.id) {
                             prioritizeSharedVideo(project.video!);
                             video.currentTime = 0;
                             video.play().catch(() => {});

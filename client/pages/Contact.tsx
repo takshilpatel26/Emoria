@@ -188,7 +188,7 @@ export default function Contact() {
               <div className="space-y-4 text-[#1f1714]/80" style={{ fontFamily: 'Ubuntu, sans-serif' }}>
                 <p><a href="mailto:emoriafilms@gmail.com" className="hover:text-[#1f1714] transition-colors">Mail: emoriafilms@gmail.com</a></p>
                 <p><a href="https://www.instagram.com/emoria.films" className="hover:text-[#1f1714] transition-colors" target="_blank" rel="noopener noreferrer">
-                Profile: Instagram
+                Instagram Profile: emoria.films
                 </a></p>
                 <p><a href="tel:+917778081672" className="hover:text-[#1f1714] transition-colors">Phone: +91 7778081672</a></p>
                 <p>Location: Ahmedabad, India</p>
