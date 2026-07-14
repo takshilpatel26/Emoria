@@ -87,22 +87,17 @@ export default function Loader({ onExit, isExiting = false, previewsReady = true
           color: #1f1714;
         }
 
-        .preload-status {
-          animation: slowFadeIn 1s ease-out forwards;
-          font-family: 'Ubuntu', sans-serif;
-          letter-spacing: 0.12em;
+        .preload-spinner {
+          width: 22px;
+          height: 22px;
+          border: 1px solid rgba(31, 23, 20, 0.25);
+          border-top-color: #1f1714;
+          border-radius: 50%;
+          animation: preloadSpin 0.9s linear infinite;
         }
 
-        .preload-dots::after {
-          content: '';
-          animation: preloadDots 1.4s steps(4, end) infinite;
-        }
-
-        @keyframes preloadDots {
-          0%, 20% { content: ''; }
-          40% { content: '.'; }
-          60% { content: '..'; }
-          80%, 100% { content: '...'; }
+        @keyframes preloadSpin {
+          to { transform: rotate(360deg); }
         }
       `}</style>
 
@@ -121,8 +116,8 @@ export default function Loader({ onExit, isExiting = false, previewsReady = true
 
         {/* Enter button - appears after initial animation completes */}
         {showButton && !isExiting && !previewsReady && (
-          <div className="preload-status mt-8 text-[10px] uppercase opacity-70">
-            Preparing previews<span className="preload-dots" />
+          <div className="mt-8 opacity-70" aria-label="Loading">
+            <div className="preload-spinner" />
           </div>
         )}
 
